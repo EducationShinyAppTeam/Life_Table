@@ -81,11 +81,11 @@ ui <- dashboardPage(skin = "black",
                                                  bsButton("selectAll_s","Select All",size="small"),
                                                  bsButton("ref1","Show Reference", size="small")),
                                                mainPanel(
-                                                 plotOutput("lineChart"),
+                                                 plotOutput("lineChart", width = "100%", height = "100%"),
 
                                                  bsPopover("lineChart", "Instruction", "This plot shows the Survival Rate to age for comparing 3 countries and sex"),
 
-                                                 br(),br(),br(),br(),
+                                                 br(),
                                                  # span(htmlOutput("refer1"),)
                                                  htmlOutput("refer1", container = tags$div, class = "custom-li-output")
                                                )))))),

@@ -1,22 +1,17 @@
 library(shiny)
 library(shinydashboard)
-library(plotrix)
 library(ggplot2)
 library(reshape2)
-library(scales)
 library(stats)
 library(Rlab)
 library(dplyr)
 library(formattable)
-library(discrimARTs)
-library(truncnorm)
 library(shinyWidgets)
 library(XML)
 library(reshape2)
 library(plyr)
 library(gridExtra)
 library(plotly)
-library(shinycssloaders)
 
 shinyServer <- function(session, input, output){
   observeEvent(input$go, {
@@ -30,9 +25,7 @@ shinyServer <- function(session, input, output){
   us_1989 <- read.csv("us_1980_1989.csv", header = FALSE)
   us_1999 <- read.csv("us_1990_1999.csv", header = FALSE)
   uk_inter <- read.csv("1991_2018_uk.csv", header = TRUE)
-  uk_f <- read.csv("uk_fertility.csv", header = FALSE)
-  us_f <- read.csv("us_fertility.csv", header = FALSE)
-  cn_f <- read.csv("cn_fertility.csv", header = FALSE)
+  fertility <- read.csv("fertility.csv", header = TRUE)
   
   #survival rate tab:
   observeEvent(input$selectAll_s,{
@@ -51,47 +44,111 @@ shinyServer <- function(session, input, output){
   })
   
   output$lineChart <- renderPlot({  
-    yrange <- c(0,1)
-    xrange <- range(age)
-    plot(xrange,yrange,type="n",cex.lab=0.0000001,
-         main=paste("Survival Rate for comparison"))
-    title(xlab="Age", ylab="Survival Rate")
-    country <- input$check
-    colors <-c()
-    if ("United Kingdom-Male" %in% country){
-      chartdata1 <- data[,2]
-      lines(age,chartdata1,col="#5E95A8",lwd=3)
-      colors<-c(colors, "#5E95A8")
-    }
-    if ("United Kingdom-Female" %in% country){
-      chartdata2 <- data[,3]
-      lines(age,chartdata2,col="#F38770",lwd=3)
-      colors<-c(colors, "#F38770")
-    }
-    if ("United States-Male" %in% country){
-      chartdata3 <- data[,4]
-      lines(age[1:100],chartdata3[1:100],col="#487C44",lwd=3)
-      colors<-c(colors, "#487C44")
-    }
-    if ("United States-Female" %in% country){
-      chartdata4 <- data[,5]
-      lines(age[1:100],chartdata4[1:100],col="#CACA3B",lwd=3)
-      colors<-c(colors, "#CACA3B")
-    }
-    if ("China-Male" %in% country){
-      chartdata5 <- data[,6]
-      lines(age,chartdata5,col="#7C627B",lwd=3)
-      colors<-c(colors, "#7C627B")
-    }
-    if ("China-Female" %in% country){
-      chartdata6 <- data[,7]
-      lines(age,chartdata6,col="#FEA54C",lwd=3)
-      colors<-c(colors, "#FEA54C")
-    }
-    if (length(country) !=0){
-      legend("bottomleft",country, 
-             col=colors,pch=15,ncol=1,bty ="n",cex=1.1)}
-  },height = 500, width = 600)
+   #  yrange <- c(0,1)
+   #  xrange <- range(age)
+   #  plot(xrange,yrange,type="n",cex.lab=0.0000001,
+   #       xaxs="i", yaxs="i",
+   #       main=paste("Survival Rate for comparison"))
+   #  title(xlab="Age", ylab="Survival Rate")
+      country <- input$check
+   #   colors <-c()
+   #   if ("United Kingdom-Male" %in% country){
+   #     chartdata1 <- data[,2]
+   #     lines(age,chartdata1,col="#5E95A8",lwd=3)
+   #     colors<-c(colors, "#5E95A8")
+   #   }
+   #   if ("United Kingdom-Female" %in% country){
+   #     chartdata2 <- data[,3]
+   #     lines(age,chartdata2,col="#F38770",lwd=3)
+   #     colors<-c(colors, "#F38770")
+   #   }
+   #   if ("United States-Male" %in% country){
+   #     chartdata3 <- data[,4]
+   #     lines(age[1:100],chartdata3[1:100],col="#487C44",lwd=3)
+   #     colors<-c(colors, "#487C44")
+   #   }
+   #   if ("United States-Female" %in% country){
+   #     chartdata4 <- data[,5]
+   #     lines(age[1:100],chartdata4[1:100],col="#CACA3B",lwd=3)
+   #     colors<-c(colors, "#CACA3B")
+   #   }
+   #   if ("China-Male" %in% country){
+   #     chartdata5 <- data[,6]
+   #     lines(age,chartdata5,col="#7C627B",lwd=3)
+   #     colors<-c(colors, "#7C627B")
+   #   }
+   #   if ("China-Female" %in% country){
+   #     chartdata6 <- data[,7]
+   #     lines(age,chartdata6,col="#FEA54C",lwd=3)
+   #     colors<-c(colors, "#FEA54C")
+   #   }
+   #   if (length(country) !=0){
+   #     legend("bottomleft",country, 
+   #            col=colors,pch=15,ncol=1,bty ="n",cex=1.1)}
+   # },height = 500, width = 600)
+    
+    longData <- cbind(rep(data$age, 6), stack(data[,2:7]))
+    names(longData) <- c("age", "sRate", "grp")
+    longData <- 
+      transform(longData, color = ifelse(
+        grp == "uk.m",
+        '#5E95A8',
+        ifelse(
+          grp == "uk.f",
+          '#F38770',
+          ifelse(
+            grp == "us.m",
+            '#487C44',
+            ifelse(
+              grp == "us.f",
+              '#CACA3B',
+              ifelse(
+                grp == "china.m",
+                '#7C627B',
+                ifelse(
+                  grp == "china.f", 
+                  '#FEA54C',
+                  NA
+                )
+              )
+            )
+          )
+        )
+      ))
+    
+    longData$grp <- 
+      plyr::revalue(
+        longData$grp,
+        c(
+          "uk.m" = "United Kingdom-Male",
+          "uk.f" = "United Kingdom-Female",
+          "us.m" = "United States-Male",
+          "us.f" = "United States-Female",
+          "china.m" = "China-Male",
+          "china.f" = "China-Female"
+        )
+      )
+    
+    subLData <- dplyr::filter(longData, longData$grp %in% country)
+    sp <- ggplot(data = subLData, aes(x = age, y = sRate, color = grp)) +
+      scale_y_continuous(expand = expand_scale(mult = 0, add = c(0, 0.05)),
+                         limits = c(0,1)) +
+      scale_x_continuous(expand = expand_scale(mult = 0, add = c(0, 5)), limits = c(0, 100)) +
+      theme(
+        panel.background = element_rect(fill = 'white', color = 'black'),
+        text = element_text(size = 14),
+        plot.title = element_text(size = 14),
+        legend.position = c(0.2, 0.3),
+        legend.title = element_blank()
+      ) +
+      labs(title = "Survival Rate for Comparison", 
+           y = "Survival Rate",
+           x = "Age(yrs)") +
+      geom_line(lwd = 1) +
+      scale_color_manual(breaks = longData$grp, values = unique(as.character(longData$color)))
+    sp
+  })
+
   
   #pyramid:
   #uk:
@@ -908,7 +965,7 @@ shinyServer <- function(session, input, output){
       theme(legend.position = 'bottom')
   })
   
-  #fecundity rate tab:
+  ############>>>>Fecundity rate tab:
   observeEvent(input$selectAll_f,{
     #if(input$selectAll_f == 0) return(NULL) 
     #else 
@@ -925,28 +982,48 @@ shinyServer <- function(session, input, output){
   })
   
   output$lineChart_2 <- renderPlot({  
-    yrange <- c(0,120)
-    xrange <- c(14,50)
-    plot(xrange,yrange,type="n",cex.lab=0.0000001,
-         main=paste("Fecunitdy Rate (per 1,000 women) for comparison"))
-    title(xlab="Age", ylab="Number of Birth per 1,000 Women")
-    color_f <-c()
-    if ("United Kingdom" %in% input$check7){
-      lines(uk_f[,1],uk_f[,2],col="#F38770",lwd=3)
-      color_f<-c(color_f, "#F38770")
-    }
-    if ("United States" %in% input$check7){
-      lines(us_f[,1],us_f[,2],col="#CACA3B",lwd=3)
-      color_f<-c(color_f, "#CACA3B")
-    }
-    if ("China" %in% input$check7){
-      lines(cn_f[,1],cn_f[,2],col="#FEA54C",lwd=3)
-      color_f<-c(color_f, "#FEA54C")
-    }
-    if (length(input$check7) !=0){
-      legend("topright",input$check7, 
-             col=color_f,pch=15,ncol=1,bty ="n",cex=1.1)}
-  },height = 500, width = 600)
+  longData2 <- cbind(rep(fertility$age, 3), stack(fertility[,2:4]))
+  names(longData2) <- c("age", "fRate", "grp")
+  longData2 <- 
+    transform(longData2, color = ifelse(
+        grp == "uk",
+        '#F38770',
+          ifelse(
+            grp == "cn",
+            '#CACA3B',
+              ifelse(
+                grp == "us", 
+                '#FEA54C',
+                NA
+              )
+      )
+    ))
+  
+  longData2$grp <- 
+    plyr::revalue(
+      longData2$grp,
+      c(
+        "uk" = "United Kingdom",
+        "us" = "United States",
+        "cn" = "China"
+      )
+    )
+  
+  subLData2 <- dplyr::filter(longData2, longData2$grp %in% input$check7)
+  ggplot(data=na.omit(subLData2), aes(x=age, y=fRate, color=grp)) +
+    geom_path(lwd = 1) +
+    scale_y_continuous(expand=expand_scale(mult = 0, add = 0), limits = c(0,120)) +
+    theme(panel.background = element_rect(fill = 'white', color = 'black'),
+          text = element_text(size = 14),
+          plot.title = element_text(size = 14),
+          legend.position = c(0.85,0.80),
+          legend.title = element_blank()) +
+    labs(title = "Fecundity Rate (per 1,000 women) for comparison",
+         y = "Number of Birth per 1,000 Women",
+         x = "Age(yrs)") +
+    scale_color_manual(breaks = longData2$grp, values = unique(as.character(longData2$color)))
+  })
+  
   
   #reference:
   observeEvent(input$ref1, {
