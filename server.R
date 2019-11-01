@@ -17,6 +17,16 @@ shinyServer <- function(session, input, output){
   observeEvent(input$go, {
     updateTabItems(session, "tabs", "survival_rate")
   })
+  observeEvent(input$info, {
+  sendSweetAlert(
+    session = session,
+    title = "Hint:",
+    type = NULL,
+    closeOnClickOutside = TRUE,
+    text="Please click the Challenge in the sidebar menu you'd like to test"
+  )
+  })
+  
   data<- read.csv("survival_rate.csv")
   age <- data[,1]
   data2 <- read.csv("Pyramid.csv")
