@@ -4,8 +4,6 @@ library(shinythemes)
 library(shinyBS)
 library(shinyWidgets)
 library(shinyjs)
-library(V8)
-library(png)
 library(ggplot2)
 library(plotly)
 
