@@ -1,6 +1,5 @@
 library(shiny)
 library(shinydashboard)
-library(plotrix)
 library(shinythemes)
 library(shinyBS)
 library(shinyWidgets)
@@ -9,7 +8,6 @@ library(V8)
 library(png)
 library(ggplot2)
 library(plotly)
-library(shinycssloaders)
 
 ui <- dashboardPage(skin = "black",
                     dashboardHeader(title = "Life Table",
@@ -81,7 +79,7 @@ ui <- dashboardPage(skin = "black",
                                                  bsButton("selectAll_s","Select All",size="small"),
                                                  bsButton("ref1","Show Reference", size="small")),
                                                mainPanel(
-                                                 plotOutput("lineChart", width = "100%", height = "100%"),
+                                                 plotOutput("lineChart"),
 
                                                  bsPopover("lineChart", "Instruction", "This plot shows the Survival Rate to age for comparing 3 countries and sex"),
 
