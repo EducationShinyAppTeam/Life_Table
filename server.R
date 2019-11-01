@@ -148,6 +148,7 @@ shinyServer <- function(session, input, output){
         panel.background = element_rect(fill = 'white', color = 'black'),
         text = element_text(size = 14),
         plot.title = element_text(size = 14),
+        axis.text = element_text(size = 14),
         legend.position = c(0.2, 0.3),
         legend.title = element_blank()
       ) +
@@ -1026,6 +1027,7 @@ shinyServer <- function(session, input, output){
     theme(panel.background = element_rect(fill = 'white', color = 'black'),
           text = element_text(size = 14),
           plot.title = element_text(size = 14),
+          axis.text = element_text(size = 14),
           legend.position = c(0.85,0.80),
           legend.title = element_blank()) +
     labs(title = "Fecundity Rate (per 1,000 women) for comparison",

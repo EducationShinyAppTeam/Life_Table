@@ -1677,6 +1677,30 @@
         "Built": "R 3.6.0; ; 2019-09-11 12:17:20 UTC; unix"
       }
     },
+    "shinycssloaders": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "description": {
+        "Package": "shinycssloaders",
+        "Type": "Package",
+        "Title": "Add CSS Loading Animations to 'shiny' Outputs",
+        "Version": "0.2.0",
+        "Date": "2017-05-03",
+        "Authors@R": "c(person(\"Andras\",\"Sali\",email=\"andras.sali@alphacruncher.hu\",role=c(\"aut\",\"cre\"),comment=\"Creator of Shiny-wrapper code\"),person(\"Luke\",\"Hass\",role=c(\"ctb\",\"cph\"),comment=\"Author of included CSS loader code\"))",
+        "Description": "Create a lightweight Shiny wrapper for the css-loaders created by Luke Hass <https://github.com/lukehaas/css-loaders>. Wrapping a Shiny output will automatically show a loader when the output is (re)calculating.",
+        "License": "GPL-3",
+        "URL": "https://github.com/andrewsali/shinycssloaders",
+        "Imports": "digest, glue, grDevices, shiny",
+        "RoxygenNote": "5.0.1",
+        "NeedsCompilation": "no",
+        "Packaged": "2017-05-12 19:20:11 UTC; andras",
+        "Author": "Andras Sali [aut, cre] (Creator of Shiny-wrapper code),\n  Luke Hass [ctb, cph] (Author of included CSS loader code)",
+        "Maintainer": "Andras Sali <andras.sali@alphacruncher.hu>",
+        "Repository": "CRAN",
+        "Date/Publication": "2017-05-12 22:46:15 UTC",
+        "Built": "R 3.6.0; ; 2019-04-27 02:59:51 UTC; unix"
+      }
+    },
     "shinydashboard": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com/",
@@ -2379,6 +2403,9 @@
     "packrat/desc/shinyBS": {
       "checksum": "d2fcbd1c5e8a234c086b3df4e64b6436"
     },
+    "packrat/desc/shinycssloaders": {
+      "checksum": "936b388db2c308d82042556d8f5d4ccd"
+    },
     "packrat/desc/shinydashboard": {
       "checksum": "1c37bc2048f42e1940101727ee1a853a"
     },
@@ -2443,7 +2470,7 @@
       "checksum": "42e12e4cc19c4759dca5c1d9df2df8d7"
     },
     "packrat/packrat.lock": {
-      "checksum": "8fa9d3aeb53edf47656e579dd425efbb"
+      "checksum": "dfda9cdb8e1fc5dcc9280c6510aabfd9"
     },
     "Pyramid.csv": {
       "checksum": "a3d765b1c6161bc3f643278ca23bc2ef"
@@ -2458,7 +2485,7 @@
       "checksum": "04dafa45cfa4d23aa3312540facf6a4b"
     },
     "ui.R": {
-      "checksum": "df8ce7e2203c60996dfb1dc63433ce9a"
+      "checksum": "b97f6c050e6f4b98ac76734fbfe7768c"
     },
     "us_1900_1979.csv": {
       "checksum": "2c2080e4e9b210f41dd83dc9baa5e2c0"

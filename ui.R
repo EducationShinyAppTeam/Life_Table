@@ -6,6 +6,7 @@ library(shinyWidgets)
 library(shinyjs)
 library(ggplot2)
 library(plotly)
+library(shinycssloaders)
 
 ui <- dashboardPage(skin = "black",
                     dashboardHeader(title = "Life Table",
@@ -48,21 +49,22 @@ ui <- dashboardPage(skin = "black",
                                 br(),
                                 br(),
                                 h3(strong("About:")),
-                                h4("In this App, you will explore various Life Tables with 3 difference countries"),
+                                p("In this App, you will explore various Life Tables with 3 difference countries"),
                                 br(),
                                 h3(strong("Instructions:")),
-                                h4(tags$li("Survival Rate: Click the country and sex combination you preferred to compare, and view the distinct Survival Rate for each country and sex. ")),
-                                h4(tags$li("Cohort Population Pyramid: View and compare Population Pyramid for difference countries, and also the combination of sex and country. ")),
-                                h4(tags$li("Actual Population Pyramid: Click the start button to view the movie of population change by year in United States and United Kingdom. ")),
-                                h4(tags$li("Fecundity Rate: Click the country you preferred, and view the difference Fecundity Rate (per 1,000 women). ")),
-                                
-                                
+                                tags$ul(
+                                  tags$li("Survival Rate: Click the country and sex combination you preferred to compare, and view the distinct Survival Rate for each country and sex. "),
+                                  tags$li("Cohort Population Pyramid: View and compare Population Pyramid for difference countries, and also the combination of sex and country. "),
+                                  tags$li("Actual Population Pyramid: Click the start button to view the movie of population change by year in United States and United Kingdom. "),
+                                  tags$li("Fecundity Rate: Click the country you preferred, and view the difference Fecundity Rate (per 1,000 women). ")
+                                ),
+                              
                                 div(style = "text-align:center",
                                     actionButton("go", "G O !", icon("bolt"), size = "medium",style = 'color: #fff; background-color: #3CBAAD',class="circle grow")),
                                 #div(style = "text-align: center",bsButton("start","Go to the overview",icon("bolt"),style = "danger",size = "large",class="circle grow")),
                                 br(),
                                 h3(strong("Acknowledgements:")),
-                                h4("This app was developed and coded by Yuqing Lei.")
+                                p("This app was developed and coded by Yuqing Lei.")
                         ),
                         
                         # Challenge Tab
