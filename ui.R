@@ -74,7 +74,7 @@ ui <- dashboardPage(skin = "black",
                                     tabPanel("Survival Rate", fluid = TRUE,
                                              sidebarLayout(
                                                sidebarPanel(
-                                                 checkboxGroupInput("check", "Select the gender(s) and countris you prefer to compare", choices = c("United Kingdom-Male", "United Kingdom-Female", "United States-Male", "United States-Female", "China-Male", "China-Female")),
+                                                 checkboxGroupInput("check", "Select the gender(s) and countries you prefer to compare", choices = c("United Kingdom-Male", "United Kingdom-Female", "United States-Male", "United States-Female", "China-Male", "China-Female")),
                                                  verbatimTextOutput(outputId = "res1"),
                                                  bsButton("selectAll_s","Select All",size="small"),
                                                  bsButton("ref1","Show Reference", size="small")),
@@ -94,7 +94,7 @@ ui <- dashboardPage(skin = "black",
                                     tabPanel("Country Comparison", fluid = TRUE,
                                              sidebarLayout(
                                                sidebarPanel(
-                                                 radioButtons("check2", "Select the countris you prefer to compare", choices = c("United Kingdom-United States", "United Kingdom-China", "United States-China")),
+                                                 radioButtons("check2", "Select the countries you prefer to compare", choices = c("United Kingdom-United States", "United Kingdom-China", "United States-China")),
                                                  bsButton("ref2","Show Reference", size="small"),
                                                  verbatimTextOutput(outputId = "res2")),
                                                # actionButton("selectAll2","Select All",size="small")),
@@ -170,7 +170,7 @@ ui <- dashboardPage(skin = "black",
                                     tabPanel("Fecundity Rate", fluid = TRUE,
                                              sidebarLayout(
                                                sidebarPanel(
-                                                 checkboxGroupInput("check7", "Select the countris you prefer to compare", choices = c("United Kingdom", "United States", "China")),
+                                                 checkboxGroupInput("check7", "Select the countries you prefer to compare", choices = c("United Kingdom", "United States", "China")),
                                                  verbatimTextOutput(outputId = "res5"),
                                                  bsButton("selectAll_f","Select All",size="small"),
                                                  bsButton("ref6","Show Reference", size="small")),

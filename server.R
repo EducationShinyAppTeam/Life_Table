@@ -23,7 +23,7 @@ shinyServer <- function(session, input, output){
     title = "Hint:",
     type = NULL,
     closeOnClickOutside = TRUE,
-    text="Please click the Challenge in the sidebar menu you'd like to test"
+    text="This app explores survival rates, population pyramids, and the fecundity rates of three different countries."
   )
   })
   
