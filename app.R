@@ -1,105 +1,444 @@
+# Load Packages ----
 library(shiny)
 library(shinydashboard)
-library(ggplot2)
-library(reshape2)
-library(stats)
-library(Rlab)
-library(dplyr)
-library(formattable)
+library(shinyBS)
 library(shinyWidgets)
-library(XML)
+library(boastUtils)
+#library(shinyjs)
+#library(ggplot2)
+library(plotly)
+library(shinycssloaders)
+library(dplyr)
+# library(formattable)
+# library(XML)
 library(reshape2)
 library(plyr)
-library(gridExtra)
-library(plotly)
+# library(gridExtra)
 
-shinyServer <- function(session, input, output){
+# Load additional dependencies and setup functions ----
+### ISSUE--These can be streamlined
+data <- read.csv("survival_rate.csv")
+age <- data[,1]
+data2 <- read.csv("Pyramid.csv")
+us_2010 <- read.csv("us-est00int-alldata.csv", header = TRUE, sep = ",")
+us_1979 <- read.csv("us_1900_1979.csv", header = FALSE)
+us_1989 <- read.csv("us_1980_1989.csv", header = FALSE)
+us_1999 <- read.csv("us_1990_1999.csv", header = FALSE)
+uk_inter <- read.csv("1991_2018_uk.csv", header = TRUE)
+fertility <- read.csv("fertility.csv", header = TRUE)
+
+# Define UI for App ----
+ui <- list(
+  dashboardPage(
+    skin = "green",
+    ### Header ----
+    dashboardHeader(
+      title = "Life Tables",
+      titleWidth = 250,
+      tags$li(class = "dropdown", actionLink("info", icon("info"))),
+      tags$li(
+        class = "dropdown",
+        boastUtils::surveyLink(name = "Life_Table")
+      ),
+      tags$li(
+        class = "dropdown",
+        tags$a(href = "https://shinyapps.science.psu.edu/",
+               icon("home")
+        )
+      )
+    ),
+    ### Sidebar ----
+    dashboardSidebar(
+      sidebarMenu(
+        id = "pages",
+        menuItem("Overview", tabName = "overview",icon = icon("dashboard")),
+        menuItem("Survival Rate", tabName = "survival_rate", icon = icon("wpexplorer")),
+        menuItem("Cohort Pop. Pyramids", tabName = "cohort", icon = icon("wpexplorer")),
+        menuItem("Actual Pop. Pyramids", tabName = "actual", icon = icon("wpexplorer")),
+        menuItem("Fecundity Rate", tabName = "fecundity_rate", icon = icon("wpexplorer")),
+        menuItem("References", tabName = "references", icon = icon("leanpub"))
+      ),
+      tags$div(
+        class = "sidebar-logo",
+        boastUtils::sidebarFooter()
+      )
+    ),
+    ### Body ----
+    dashboardBody(
+      tabItems(
+        #### Overview Page ----
+        tabItem(
+          tabName = "overview",
+          h1("Life Tables"),
+          p("In this App, you will explore various Life Tables with 3 different
+            countries"),
+          h2("Instructions"),
+          p("Use the left sidebar menu to explore the following life tables."),
+          tags$ul(
+            tags$li(tags$strong("Survival Rate:"), " Click the country and sex
+                    combination you preferred to compare, and view the distinct
+                    Survival Rate for each country and sex."),
+            tags$li(tags$strong("Cohort Population Pyramid:"), " View and compare
+                    Population Pyramids for different countries, as well as the
+                    combination of sex and country."),
+            tags$li(tags$strong("Actual Population Pyramid:"), " Click the start
+                    button to watch the population change by year in United
+                    States and United Kingdom."),
+            tags$li(tags$strong("Fecundity Rate:"), " Click the country you
+                    want to explore and then view the different Fecundity Rate
+                    (per 1,000 women).")
+          ),
+          div(
+            style = "text-align:center;",
+            bsButton(
+              inputId = "go",
+              label = "Go to Survival Rate",
+              icon = icon("bolt"),
+              size = "large",
+              style = "default"
+            )
+          ),
+          br(),
+          br(),
+          h2("Acknowledgements"),
+          p("This app was developed and coded by Yuqing Lei with the support of
+            funding provided by Stephen Schaeffer.",
+            br(),
+            br(),
+            br(),
+            div(class = "updated", "Last Update: 5/27/2021 by NJH.")
+          )
+        ),
+        #### Survival Rate Page ----
+        tabItem(
+          tabName = "survival_rate",
+          h2("Survial Rate"),
+          p("This plot shows the Survival Rate up to different ages for three
+            different countries and sexes."),
+          fluidRow(
+            column(
+              width = 4,
+              offset = 0,
+              wellPanel(
+                checkboxGroupInput(
+                  inputId = "check",
+                  label = "Select the sex(es) and countries you wish to compare",
+                  choices = c(
+                    "United Kingdom-Male",
+                    "United Kingdom-Female",
+                    "United States-Male",
+                    "United States-Female",
+                    "China-Male",
+                    "China-Female"
+                  )
+                ),
+                ### ISSUE--What is this?
+                verbatimTextOutput(outputId = "res1"),
+                bsButton(
+                  inputId = "selectAll_s",
+                  label = "Select All",
+                  size = "large"
+                ),
+                ### ISSUE--Move these to the Reference Page
+                bsButton("ref1","Show Reference", size="small")
+              )
+            ),
+            column(
+              width = 8,
+              offset = 0,
+              plotOutput("lineChart")
+            )
+          ),
+          ### ISSUE--This will be removed with the reference page
+          htmlOutput("refer1", container = tags$div, class = "custom-li-output")
+        ),
+        #### Cohort Pyramid Page----
+        tabItem(
+          tabName = "cohort",
+          h2("Cohort Population Pyramids"),
+          p("Some explanatory text is needed here."),
+          tabsetPanel(
+            id = "cohortPyramid",
+            type = "tabs",
+            tabPanel(
+              title = "Country to Country",
+              wellPanel(
+                radioButtons(
+                  inputId = "check2",
+                  label = "Select which countries you want to compare",
+                  ### ISSUE--alter these to be vs. rather than -
+                  choices = c(
+                    "United Kingdom-United States",
+                    "United Kingdom-China",
+                    "United States-China"
+                  )
+                ),
+                ### ISSUE--move to references tab
+                bsButton("ref2","Show Reference", size="small"),
+                ### ISSUE--what is this?
+                verbatimTextOutput(outputId = "res2")
+              ),
+              div(
+                style = "text-align: center;",
+                uiOutput('title1')
+              ),
+              plotlyOutput("pyramid") %>%
+                withSpinner(color = "#3CBAAD")
+            ),
+            tabPanel(
+              title = "Country & Sex Comparisons",
+              fluidRow(
+                column(
+                  width = 4,
+                  offset = 0,
+                  wellPanel(
+                    p("Select which Country-Sex pairs you wish to compare cohort
+                      pyramids for."),
+                    radioButtons(
+                      inputId = "check5",
+                      label = "Left side of the cohort pyramid",
+                      choices =  c(
+                        "United Kingdom-Male",
+                        "United Kingdom-Female",
+                        "United States-Male",
+                        "United States-Female",
+                        "China-Male",
+                        "China-Female"
+                      ),
+                      selected = "United Kingdom-Female"
+                    ),
+                    radioButtons(
+                      inputId = "check4",
+                      label = "Right side of the cohort pyramid",
+                      choices = c(
+                        "United Kingdom-Male",
+                        "United Kingdom-Female",
+                        "United States-Male",
+                        "United States-Female",
+                        "China-Male",
+                        "China-Female"
+                      ),
+                      selected = "United Kingdom-Male"
+                    ),
+                    ### ISSUE--what are these?
+                    verbatimTextOutput(outputId = "res3"),
+                    verbatimTextOutput(outputId = "res4"),
+                    ### ISSUE--move into actuall references
+                    bsButton("ref3","Show Reference", size="small")
+                  )
+                ),
+                column(
+                  width = 8,
+                  offset = 0,
+                  plotlyOutput("pyramid2") %>%
+                    withSpinner(color = "#3CBAAD")
+                )
+              ),
+              ### ISSUE--move to references
+              htmlOutput("refer3", container = tags$div, class = "custom-li-output")
+            )
+          )
+        ),
+        #### Actual Population Pyramids ----
+        tabItem(
+          tabName = "actual",
+          ### ISSUE move into a Single Page
+          h2("Actual Population Pyramid"),
+          p("Select which country (United States or United Kingdom) and watch the
+            populations change over time."),
+          tabsetPanel(
+            id = "temp1",
+            tabPanel(
+              title = "United States",
+              fluidRow(
+                column(
+                  width = 4,
+                  offset = 0,
+                  wellPanel(
+                    sliderInput(
+                      inputId = 'check3',
+                      label = 'Year',
+                      min = 1900,
+                      max = 2010,
+                      value = 1900,
+                      round = TRUE,
+                      sep = "",
+                      animate = TRUE
+                      ### ISSUE--set animation options
+                    ),
+                    ### ISSUE--move into references
+                    bsButton("ref4","Show Reference", size="small")
+                  )
+                ),
+                column(
+                  width = 8,
+                  offset = 0,
+                  plotOutput("intercensal_us")
+                )
+              ),
+              htmlOutput("refer4", container = tags$div, class = "custom-li-output")
+            ),
+            tabPanel(
+              title = "United Kingdom",
+              fluidRow(
+                column(
+                  width = 4,
+                  offset = 0,
+                  wellPanel(
+                    sliderInput(
+                      inputId = 'check6',
+                      label = 'Year',
+                      min = 1991,
+                      max = 2018,
+                      value = 1991,
+                      round = TRUE,
+                      sep = "",
+                      animate = TRUE
+                      ### ISSUE--set animation options
+                    ),
+                    ### ISSUE--move into references
+                    bsButton("ref5","Show Reference", size="small")
+                  )
+                ),
+                column(
+                  width = 8,
+                  offset = 0,
+                  plotOutput("intercensal_uk")
+                )
+              ),
+              htmlOutput("refer5", container = tags$div, class = "custom-li-output")
+            )
+          )
+        ),
+        #### Fecundity Rate Page ----
+        tabItem(
+          tabName = "fecundity_rate",
+          h2("Fecundity Rate"),
+          p("some useful text needs to get added here; This plot shows Fecundity
+            Rate (per 1,000 women) to age for comparing 3 countries"),
+          fluidRow(
+            column(
+              width = 4,
+              offset = 0,
+              wellPanel(
+                checkboxGroupInput(
+                  inputId = "check7",
+                  label = "Select the countries you want to compare",
+                  choices = c(
+                    "United Kingdom",
+                    "United States",
+                    "China"
+                  )
+                ),
+                ### ISSUE--what is this?
+                verbatimTextOutput(outputId = "res5"),
+                bsButton(
+                  inputId = "selectAll_f",
+                  label = "Select All",
+                  style = "default",
+                  size = "large"
+                ),
+                ### ISSUE--what is this?
+                bsButton("ref6","Show Reference", size="small")
+              )
+            ),
+            column(
+              width = 8,
+              offset = 0,
+              plotOutput("lineChart_2")
+            )
+          ),
+          ### ISSUE--move to references
+          htmlOutput("refer6", container = tags$div, class = "custom-li-output")
+        ),
+        #### References ----
+        tabItem(
+          tabName = "references",
+          h2("References")
+        )
+      )
+    )
+  )
+)
+
+# Define server logic ----
+server <- function(input, output, session) {
   observeEvent(input$go, {
     updateTabItems(session, "tabs", "survival_rate")
   })
   observeEvent(input$info, {
-  sendSweetAlert(
-    session = session,
-    title = "Hint:",
-    type = NULL,
-    closeOnClickOutside = TRUE,
-    text="This app explores survival rates, population pyramids, and the fecundity rates of three different countries."
-  )
+    sendSweetAlert(
+      session = session,
+      title = "Hint:",
+      type = NULL,
+      closeOnClickOutside = TRUE,
+      text="This app explores survival rates, population pyramids, and the fecundity rates of three different countries."
+    )
   })
-  
-  data<- read.csv("survival_rate.csv")
-  age <- data[,1]
-  data2 <- read.csv("Pyramid.csv")
-  us_2010 <- read.csv("us-est00int-alldata.csv", header = TRUE, sep=",")
-  us_1979 <- read.csv("us_1900_1979.csv", header = FALSE)
-  us_1989 <- read.csv("us_1980_1989.csv", header = FALSE)
-  us_1999 <- read.csv("us_1990_1999.csv", header = FALSE)
-  uk_inter <- read.csv("1991_2018_uk.csv", header = TRUE)
-  fertility <- read.csv("fertility.csv", header = TRUE)
-  
+
   #survival rate tab:
   observeEvent(input$selectAll_s,{
-    # if(input$selectAll_s == 0) return(NULL) 
-    # else 
+    # if(input$selectAll_s == 0) return(NULL)
+    # else
     if ((input$selectAll_s %% 2) == 0) {
       updateButton(session, "selectAll_s", label = "Select All")
       updateCheckboxGroupInput(session,"check", choices=c("United Kingdom-Male", "United Kingdom-Female", "United States-Male", "United States-Female", "China-Male", "China-Female"))
     }
     else{
       updateButton(session, "selectAll_s", label = "Unselect")
-      updateCheckboxGroupInput(session,"check",choices=c("United Kingdom-Male", "United Kingdom-Female", "United States-Male", "United States-Female", "China-Male", "China-Female"), 
+      updateCheckboxGroupInput(session,"check",choices=c("United Kingdom-Male", "United Kingdom-Female", "United States-Male", "United States-Female", "China-Male", "China-Female"),
                                selected = c("United Kingdom-Male", "United Kingdom-Female", "United States-Male", "United States-Female", "China-Male", "China-Female"))
     }
-    
+
   })
-  
-  output$lineChart <- renderPlot({  
-   #  yrange <- c(0,1)
-   #  xrange <- range(age)
-   #  plot(xrange,yrange,type="n",cex.lab=0.0000001,
-   #       xaxs="i", yaxs="i",
-   #       main=paste("Survival Rate for comparison"))
-   #  title(xlab="Age", ylab="Survival Rate")
-      country <- input$check
-   #   colors <-c()
-   #   if ("United Kingdom-Male" %in% country){
-   #     chartdata1 <- data[,2]
-   #     lines(age,chartdata1,col="#5E95A8",lwd=3)
-   #     colors<-c(colors, "#5E95A8")
-   #   }
-   #   if ("United Kingdom-Female" %in% country){
-   #     chartdata2 <- data[,3]
-   #     lines(age,chartdata2,col="#F38770",lwd=3)
-   #     colors<-c(colors, "#F38770")
-   #   }
-   #   if ("United States-Male" %in% country){
-   #     chartdata3 <- data[,4]
-   #     lines(age[1:100],chartdata3[1:100],col="#487C44",lwd=3)
-   #     colors<-c(colors, "#487C44")
-   #   }
-   #   if ("United States-Female" %in% country){
-   #     chartdata4 <- data[,5]
-   #     lines(age[1:100],chartdata4[1:100],col="#CACA3B",lwd=3)
-   #     colors<-c(colors, "#CACA3B")
-   #   }
-   #   if ("China-Male" %in% country){
-   #     chartdata5 <- data[,6]
-   #     lines(age,chartdata5,col="#7C627B",lwd=3)
-   #     colors<-c(colors, "#7C627B")
-   #   }
-   #   if ("China-Female" %in% country){
-   #     chartdata6 <- data[,7]
-   #     lines(age,chartdata6,col="#FEA54C",lwd=3)
-   #     colors<-c(colors, "#FEA54C")
-   #   }
-   #   if (length(country) !=0){
-   #     legend("bottomleft",country, 
-   #            col=colors,pch=15,ncol=1,bty ="n",cex=1.1)}
-   # },height = 500, width = 600)
-    
+
+  output$lineChart <- renderPlot({
+    #  yrange <- c(0,1)
+    #  xrange <- range(age)
+    #  plot(xrange,yrange,type="n",cex.lab=0.0000001,
+    #       xaxs="i", yaxs="i",
+    #       main=paste("Survival Rate for comparison"))
+    #  title(xlab="Age", ylab="Survival Rate")
+    country <- input$check
+    #   colors <-c()
+    #   if ("United Kingdom-Male" %in% country){
+    #     chartdata1 <- data[,2]
+    #     lines(age,chartdata1,col="#5E95A8",lwd=3)
+    #     colors<-c(colors, "#5E95A8")
+    #   }
+    #   if ("United Kingdom-Female" %in% country){
+    #     chartdata2 <- data[,3]
+    #     lines(age,chartdata2,col="#F38770",lwd=3)
+    #     colors<-c(colors, "#F38770")
+    #   }
+    #   if ("United States-Male" %in% country){
+    #     chartdata3 <- data[,4]
+    #     lines(age[1:100],chartdata3[1:100],col="#487C44",lwd=3)
+    #     colors<-c(colors, "#487C44")
+    #   }
+    #   if ("United States-Female" %in% country){
+    #     chartdata4 <- data[,5]
+    #     lines(age[1:100],chartdata4[1:100],col="#CACA3B",lwd=3)
+    #     colors<-c(colors, "#CACA3B")
+    #   }
+    #   if ("China-Male" %in% country){
+    #     chartdata5 <- data[,6]
+    #     lines(age,chartdata5,col="#7C627B",lwd=3)
+    #     colors<-c(colors, "#7C627B")
+    #   }
+    #   if ("China-Female" %in% country){
+    #     chartdata6 <- data[,7]
+    #     lines(age,chartdata6,col="#FEA54C",lwd=3)
+    #     colors<-c(colors, "#FEA54C")
+    #   }
+    #   if (length(country) !=0){
+    #     legend("bottomleft",country,
+    #            col=colors,pch=15,ncol=1,bty ="n",cex=1.1)}
+    # },height = 500, width = 600)
+
     longData <- cbind(rep(data$age, 6), stack(data[,2:7]))
     names(longData) <- c("age", "sRate", "grp")
-    longData <- 
+    longData <-
       transform(longData, color = ifelse(
         grp == "uk.m",
         '#5E95A8',
@@ -116,7 +455,7 @@ shinyServer <- function(session, input, output){
                 grp == "china.m",
                 '#7C627B',
                 ifelse(
-                  grp == "china.f", 
+                  grp == "china.f",
                   '#FEA54C',
                   NA
                 )
@@ -125,8 +464,8 @@ shinyServer <- function(session, input, output){
           )
         )
       ))
-    
-    longData$grp <- 
+
+    longData$grp <-
       plyr::revalue(
         longData$grp,
         c(
@@ -138,7 +477,7 @@ shinyServer <- function(session, input, output){
           "china.f" = "China-Female"
         )
       )
-    
+
     subLData <- dplyr::filter(longData, longData$grp %in% country)
     sp <- ggplot(data = subLData, aes(x = age, y = sRate, color = grp)) +
       scale_y_continuous(expand = expand_scale(mult = 0, add = c(0, 0.05)),
@@ -152,7 +491,7 @@ shinyServer <- function(session, input, output){
         legend.position = c(0.2, 0.3),
         legend.title = element_blank()
       ) +
-      labs(title = "Survival Rate for Comparison", 
+      labs(title = "Survival Rate for Comparison",
            y = "Survival Rate",
            x = "Age(yrs)") +
       geom_line(lwd = 1) +
@@ -160,72 +499,72 @@ shinyServer <- function(session, input, output){
     sp
   })
 
-  
+
   #pyramid:
   #uk:
-  uk <- data2[,c(1,6,7)]  
+  uk <- data2[,c(1,6,7)]
   names(uk) <- c("Age", "UK_Female", "UK_Male")
   uk$UK_Male <- -1 * uk$UK_Male
   uk$Age <- factor(uk$Age, levels = uk$Age, labels = uk$Age)
-  df1 <- melt(uk, 
-              value.name='Population', 
-              variable.name = 'Gender', 
-              id.vars='Age' ) 
-  uk_plot <- ggplot(df1, mapping = aes(x = Age, y = Population, fill = Gender)) + 
+  df1 <- melt(uk,
+              value.name='Population',
+              variable.name = 'Gender',
+              id.vars='Age' )
+  uk_plot <- ggplot(df1, mapping = aes(x = Age, y = Population, fill = Gender)) +
     #ggtitle("United Kingdom")+
-    geom_bar(subset = .(Gender == "UK_Male"), stat = "identity", show.legend = F) + 
-    geom_bar(subset = .(Gender == "UK_Female"), stat = "identity", show.legend = F) + 
-    scale_y_continuous(breaks = seq(-100000, 100000, 20000), 
+    geom_bar(subset = .(Gender == "UK_Male"), stat = "identity", show.legend = F) +
+    geom_bar(subset = .(Gender == "UK_Female"), stat = "identity", show.legend = F) +
+    scale_y_continuous(breaks = seq(-100000, 100000, 20000),
                        labels = paste0(as.character(c(seq(100, 0, -20), seq(20, 100, 20)))))+
-    scale_x_discrete(breaks = seq(0,100,5), 
+    scale_x_discrete(breaks = seq(0,100,5),
                      labels = paste0(seq(0,100,5)))+
-    coord_flip() + 
-    #scale_fill_brewer(palette = "Set1") + 
+    coord_flip() +
+    #scale_fill_brewer(palette = "Set1") +
     scale_fill_manual(values=c("#F38770", "#5E95A8"))+
     theme_bw()+
     ylab("Percentage of Still Live")
-  
+
   #us:
-  us <- data2[,c(1,2,3)]  
+  us <- data2[,c(1,2,3)]
   names(us) <- c("Age", "US_Female", "US_Male")
   us$US_Male <- -1 * us$US_Male
   us$Age <- factor(us$Age, levels = us$Age, labels = us$Age)
-  df2 <- melt(us, 
-              value.name='Population', 
-              variable.name = 'Gender', 
-              id.vars='Age' ) 
-  us_plot <- ggplot(df2, mapping = aes(x = Age, y = Population, fill = Gender)) + 
+  df2 <- melt(us,
+              value.name='Population',
+              variable.name = 'Gender',
+              id.vars='Age' )
+  us_plot <- ggplot(df2, mapping = aes(x = Age, y = Population, fill = Gender)) +
     #ggtitle("United States")+
-    geom_bar(subset = .(Gender == "US_Male"), stat = "identity", show.legend = F) + 
-    geom_bar(subset = .(Gender == "US_Female"), stat = "identity", show.legend = F) + 
-    scale_y_continuous(breaks = seq(-100000, 100000, 20000), 
+    geom_bar(subset = .(Gender == "US_Male"), stat = "identity", show.legend = F) +
+    geom_bar(subset = .(Gender == "US_Female"), stat = "identity", show.legend = F) +
+    scale_y_continuous(breaks = seq(-100000, 100000, 20000),
                        labels = paste0(as.character(c(seq(100, 0, -20), seq(20, 100, 20))), "%" )) +
-    scale_x_discrete(breaks = seq(0,100,5), 
+    scale_x_discrete(breaks = seq(0,100,5),
                      labels = paste0(seq(0,100,5)))+
-    coord_flip() + 
-    #scale_fill_brewer(palette = "Set1") + 
+    coord_flip() +
+    #scale_fill_brewer(palette = "Set1") +
     scale_fill_manual(values=c("#CACA3B", "#487C44"))+
     theme_bw()+
     ylab("Percentage of Still Live")
   #cn:
-  cn <- data2[,c(1,4,5)]  
+  cn <- data2[,c(1,4,5)]
   names(cn) <- c("Age", "CN_Female", "CN_Male")
   cn$CN_Male <- -1 * cn$CN_Male
   cn$Age <- factor(cn$Age, levels = cn$Age, labels = cn$Age)
-  df3 <- melt(cn, 
-              value.name='Population', 
-              variable.name = 'Gender', 
-              id.vars='Age' ) 
+  df3 <- melt(cn,
+              value.name='Population',
+              variable.name = 'Gender',
+              id.vars='Age' )
   cn_plot <- ggplot(df3, mapping = aes(x = Age, y = Population, fill = Gender)) +
     #ggtitle("China")+
-    geom_bar(subset = .(Gender == "CN_Male"), stat = "identity") + 
-    geom_bar(subset = .(Gender == "CN_Female"), stat = "identity") + 
-    scale_y_continuous(breaks = seq(-100000, 100000, 20000), 
+    geom_bar(subset = .(Gender == "CN_Male"), stat = "identity") +
+    geom_bar(subset = .(Gender == "CN_Female"), stat = "identity") +
+    scale_y_continuous(breaks = seq(-100000, 100000, 20000),
                        labels = paste0(as.character(c(seq(100, 0, -20), seq(20, 100, 20))))) +
-    scale_x_discrete(breaks = seq(0,100,5), 
+    scale_x_discrete(breaks = seq(0,100,5),
                      labels = paste0(seq(0,100,5)))+
-    coord_flip() + 
-    # scale_fill_brewer(palette = "Set1") + 
+    coord_flip() +
+    # scale_fill_brewer(palette = "Set1") +
     # scale_fill_hue(c=45, l=75)
     scale_fill_manual(values=c("#FEA54C", "#7C627B"))+
     theme_bw() +
@@ -237,7 +576,7 @@ shinyServer <- function(session, input, output){
   #  return(legend)}
   #pyramid tab (1):
   output$title1 <- renderUI({
-    h4(input$check2) 
+    h4(input$check2)
   })
   output$pyramid <- renderPlotly({
     if ("United Kingdom-United States" %in% input$check2){
@@ -254,15 +593,15 @@ shinyServer <- function(session, input, output){
       p2 <- ggplotly(cn_plot) %>% layout(xaxis = list(showgrid = F), yaxis = list(showgrid = F))
     }
     p <- subplot(p1,p2, shareX=T) %>% layout(legend = list(orientation='h', x=0, y=10))
-    
+
     # mylegend<-g_legend(p1)
     # p3 <- grid.arrange(arrangeGrob(p1 + theme(legend.position="none"),
     #                                p2 + theme(legend.position="none"),
     #                                nrow=1),
     #                   mylegend, nrow=2,heights=c(10, 1))
-    
+
   })
-  
+
   #pyramid (2):
   color_r <- c()
   color_l <- c()
@@ -465,24 +804,24 @@ shinyServer <- function(session, input, output){
         return(NULL)
       }
     }
-    
+
     names(com) <- c("Age", paste0(input$check5), paste0(input$check4))
     com[,2] <- -1 * com[,2]
     com$Age <- factor(com$Age, levels = com$Age, labels = com$Age)
-    df_com <- melt(com, 
-                   value.name='Population', 
-                   variable.name = 'Country_Gender', 
+    df_com <- melt(com,
+                   value.name='Population',
+                   variable.name = 'Country_Gender',
                    id.vars='Age' )
     plot_com <- ggplot(df_com, mapping = aes(x = Age, y = Population, fill = Country_Gender)) +
-      geom_bar(subset = .(Country_Gender == paste0(input$check4)), stat = "identity") + 
+      geom_bar(subset = .(Country_Gender == paste0(input$check4)), stat = "identity") +
       geom_bar(subset = .(Country_Gender == paste0(input$check5)), stat = "identity") +
-      scale_y_continuous(breaks = seq(-100000, 100000, 10000), 
+      scale_y_continuous(breaks = seq(-100000, 100000, 10000),
                          labels = paste0(as.character(c(seq(100, 0, -10), seq(10, 100, 10))))) +
-      scale_x_discrete(breaks = seq(0,100,5), 
+      scale_x_discrete(breaks = seq(0,100,5),
                        labels = paste0(seq(0,100,5)))+
-      coord_flip() + 
+      coord_flip() +
       theme_bw() +
-      #scale_fill_brewer(palette = "Spectral") + 
+      #scale_fill_brewer(palette = "Spectral") +
       scale_fill_manual(values=c(color_l,color_r))+
       ylab("Percentage of Still Live")
     ggplotly(plot_com) %>% layout(legend = list(orientation='h', x=0, y=10))
@@ -490,7 +829,7 @@ shinyServer <- function(session, input, output){
   # output$info1 <- renderText({
   #   paste0("Age = ", round(input$plot_click1$y-1), "\nPopulation=", input$plot_click1$x/1000, "%")
   # })
-  
+
   #intercensal_us
   output$intercensal_us <- renderPlot({
     #1900-1909
@@ -837,33 +1176,33 @@ shinyServer <- function(session, input, output){
     if (2010 == input$check3){
       us_est <- us_2010[1046:1131,c(3, 6, 5)]
     }
-    
+
     yearshow1 <- paste(input$check3,"Year",sep="")
     names(us_est) <- c("Age", "Female", "Male")
     us_est$Male <- -1 * us_est$Male
     us_est$Age <- factor(us_est$Age, levels = us_est$Age, labels = us_est$Age)
-    df_1 <- melt(us_est, 
-                 value.name='Population', 
-                 variable.name = 'Gender', 
+    df_1 <- melt(us_est,
+                 value.name='Population',
+                 variable.name = 'Gender',
                  id.vars='Age' )
-    my_theme <- theme(axis.text.x  = element_text(face="bold",angle=45, size=50), 
+    my_theme <- theme(axis.text.x  = element_text(face="bold",angle=45, size=50),
                       axis.text.y  = element_text(face="bold",angle=45, size=50))
-    ggplot(df_1, mapping = aes(x = Age, y = Population, fill = Gender)) + 
-      geom_bar(subset = .(Gender == "Male"), stat = "identity") + 
+    ggplot(df_1, mapping = aes(x = Age, y = Population, fill = Gender)) +
+      geom_bar(subset = .(Gender == "Male"), stat = "identity") +
       geom_bar(subset = .(Gender == "Female"), stat = "identity") +
-      scale_y_continuous(breaks = seq(-5000000, 5000000, 500000), 
+      scale_y_continuous(breaks = seq(-5000000, 5000000, 500000),
                          labels = paste0(as.character(c(seq(5, 0, -0.5), seq(0.5, 5, 0.5))), "million" )) +
-      scale_x_discrete(breaks = c("0","5","10","15","20","25","30","35","40","45","50","55","60","65","70","75","80","85","90","95","100"), 
+      scale_x_discrete(breaks = c("0","5","10","15","20","25","30","35","40","45","50","55","60","65","70","75","80","85","90","95","100"),
                        labels = c("0","5","10","15","20","25","30","35","40","45","50","55","60","65","70","75+","80","85+","90","95","100+")) +
       my_theme +
-      coord_flip() + 
+      coord_flip() +
       scale_fill_manual(values=c("#CACA3B", "#487C44")) +
       theme_bw(base_size = 20) +
       theme(legend.position = 'bottom')+
       annotate(geom="text", x=73, y=0, label=yearshow1,
                color="black")
   })
-  
+
   #intercensal_us:
   output$intercensal_uk <- renderPlot({
     if (1991 == input$check6){
@@ -954,89 +1293,89 @@ shinyServer <- function(session, input, output){
     names(uk_est) <- c("Age", "Female", "Male")
     uk_est$Male <- -1 * uk_est$Male
     uk_est$Age <- factor(uk_est$Age, levels = uk_est$Age, labels = uk_est$Age)
-    df_1 <- melt(uk_est, 
-                 value.name='Population', 
-                 variable.name = 'Gender', 
+    df_1 <- melt(uk_est,
+                 value.name='Population',
+                 variable.name = 'Gender',
                  id.vars='Age' )
-    my_theme <- theme(axis.text.x  = element_text(face="bold",angle=45, size=50), 
+    my_theme <- theme(axis.text.x  = element_text(face="bold",angle=45, size=50),
                       axis.text.y  = element_text(face="bold",angle=45, size=50))
-    ggplot(df_1, mapping = aes(x = Age, y = Population, fill = Gender)) + 
-      geom_bar(subset = .(Gender == "Male"), stat = "identity") + 
+    ggplot(df_1, mapping = aes(x = Age, y = Population, fill = Gender)) +
+      geom_bar(subset = .(Gender == "Male"), stat = "identity") +
       geom_bar(subset = .(Gender == "Female"), stat = "identity") +
-      scale_y_continuous(breaks = seq(-5000000, 5000000, 500000), 
+      scale_y_continuous(breaks = seq(-5000000, 5000000, 500000),
                          labels = paste0(as.character(c(seq(5, 0, -0.5), seq(0.5, 5, 0.5))), "million" )) +
-      scale_x_discrete(breaks = c("0","5","10","15","20","25","30","35","40","45","50","55","60","65","70","75","80","85","90"), 
+      scale_x_discrete(breaks = c("0","5","10","15","20","25","30","35","40","45","50","55","60","65","70","75","80","85","90"),
                        labels = c("0","5","10","15","20","25","30","35","40","45","50","55","60","65","70","75","80","85+","90+")) +
       my_theme +
-      coord_flip() + 
+      coord_flip() +
       scale_fill_manual(values=c("#F38770", "#5E95A8")) +
       theme_bw(base_size = 20) +
       annotate(geom="text", x=83, y=0, label=yearshow2,
                color="black")+
       theme(legend.position = 'bottom')
   })
-  
+
   ############>>>>Fecundity rate tab:
   observeEvent(input$selectAll_f,{
-    #if(input$selectAll_f == 0) return(NULL) 
-    #else 
+    #if(input$selectAll_f == 0) return(NULL)
+    #else
     if ((input$selectAll_f%%2) == 0) {
       updateButton(session, "selectAll_f", label = "Select All")
       updateCheckboxGroupInput(session,"check7", choices=c("United Kingdom", "United States", "China"))
     }
     else{
       updateButton(session, "selectAll_f", label="Unselect")
-      updateCheckboxGroupInput(session,"check7",choices=c("United Kingdom", "United States", "China"), 
+      updateCheckboxGroupInput(session,"check7",choices=c("United Kingdom", "United States", "China"),
                                selected = c("United Kingdom", "United States", "China"))
     }
-    
+
   })
-  
-  output$lineChart_2 <- renderPlot({  
-  longData2 <- cbind(rep(fertility$age, 3), stack(fertility[,2:4]))
-  names(longData2) <- c("age", "fRate", "grp")
-  longData2 <- 
-    transform(longData2, color = ifelse(
+
+  output$lineChart_2 <- renderPlot({
+    longData2 <- cbind(rep(fertility$age, 3), stack(fertility[,2:4]))
+    names(longData2) <- c("age", "fRate", "grp")
+    longData2 <-
+      transform(longData2, color = ifelse(
         grp == "uk",
         '#F38770',
+        ifelse(
+          grp == "cn",
+          '#CACA3B',
           ifelse(
-            grp == "cn",
-            '#CACA3B',
-              ifelse(
-                grp == "us", 
-                '#FEA54C',
-                NA
-              )
+            grp == "us",
+            '#FEA54C',
+            NA
+          )
+        )
+      ))
+
+    longData2$grp <-
+      plyr::revalue(
+        longData2$grp,
+        c(
+          "uk" = "United Kingdom",
+          "us" = "United States",
+          "cn" = "China"
+        )
       )
-    ))
-  
-  longData2$grp <- 
-    plyr::revalue(
-      longData2$grp,
-      c(
-        "uk" = "United Kingdom",
-        "us" = "United States",
-        "cn" = "China"
-      )
-    )
-  
-  subLData2 <- dplyr::filter(longData2, longData2$grp %in% input$check7)
-  ggplot(data=na.omit(subLData2), aes(x=age, y=fRate, color=grp)) +
-    geom_path(lwd = 1) +
-    scale_y_continuous(expand=expand_scale(mult = 0, add = 0), limits = c(0,120)) +
-    theme(panel.background = element_rect(fill = 'white', color = 'black'),
-          text = element_text(size = 14),
-          plot.title = element_text(size = 14),
-          axis.text = element_text(size = 14),
-          legend.position = c(0.85,0.80),
-          legend.title = element_blank()) +
-    labs(title = "Fecundity Rate (per 1,000 women) for comparison",
-         y = "Number of Birth per 1,000 Women",
-         x = "Age(yrs)") +
-    scale_color_manual(breaks = longData2$grp, values = unique(as.character(longData2$color)))
+
+    subLData2 <- dplyr::filter(longData2, longData2$grp %in% input$check7)
+    ggplot(data=na.omit(subLData2), aes(x=age, y=fRate, color=grp)) +
+      geom_path(lwd = 1) +
+      scale_y_continuous(expand=expand_scale(mult = 0, add = 0), limits = c(0,120)) +
+      theme(panel.background = element_rect(fill = 'white', color = 'black'),
+            text = element_text(size = 14),
+            plot.title = element_text(size = 14),
+            axis.text = element_text(size = 14),
+            legend.position = c(0.85,0.80),
+            legend.title = element_blank()) +
+      labs(title = "Fecundity Rate (per 1,000 women) for comparison",
+           y = "Number of Birth per 1,000 Women",
+           x = "Age(yrs)") +
+      scale_color_manual(breaks = longData2$grp, values = unique(as.character(longData2$color)))
   })
-  
-  
+
+
   #reference:
   observeEvent(input$ref1, {
     if ((input$ref1 %% 2) == 0) {
@@ -1135,3 +1474,6 @@ shinyServer <- function(session, input, output){
     }
   })
 }
+
+# Boast App Call ----
+boastUtils::boastApp(ui = ui, server = server)

@@ -1,10 +1,10 @@
 library(shiny)
 library(shinydashboard)
-library(shinythemes)
+#library(shinythemes)
 library(shinyBS)
-library(shinyWidgets)
-library(shinyjs)
-library(ggplot2)
+#library(shinyWidgets)
+#library(shinyjs)
+#library(ggplot2)
 library(plotly)
 library(shinycssloaders)
 
@@ -58,7 +58,7 @@ ui <- dashboardPage(skin = "black",
                                   tags$li("Actual Population Pyramid: Click the start button to view the movie of population change by year in United States and United Kingdom. "),
                                   tags$li("Fecundity Rate: Click the country you preferred, and view the difference Fecundity Rate (per 1,000 women). ")
                                 ),
-                              
+
                                 div(style = "text-align:center",
                                     actionButton("go", "G O !", icon("bolt"), size = "medium",style = 'color: #fff; background-color: #3CBAAD',class="circle grow")),
                                 #div(style = "text-align: center",bsButton("start","Go to the overview",icon("bolt"),style = "danger",size = "large",class="circle grow")),
@@ -66,7 +66,7 @@ ui <- dashboardPage(skin = "black",
                                 h3(strong("Acknowledgements:")),
                                 p("This app was developed and coded by Yuqing Lei.")
                         ),
-                        
+
                         # Challenge Tab
                         tabItem(tabName = "survival_rate",
                                 fluidPage(
@@ -87,7 +87,7 @@ ui <- dashboardPage(skin = "black",
                                                  # span(htmlOutput("refer1"),)
                                                  htmlOutput("refer1", container = tags$div, class = "custom-li-output")
                                                )))))),
-                  
+
                         tabItem(tabName = "cohort",
                                 fluidPage(
                                   tabsetPanel(
@@ -98,7 +98,7 @@ ui <- dashboardPage(skin = "black",
                                                  bsButton("ref2","Show Reference", size="small"),
                                                  verbatimTextOutput(outputId = "res2")),
                                                # actionButton("selectAll2","Select All",size="small")),
-                                               
+
                                                mainPanel(
                                                  fluidRow(
 
@@ -135,7 +135,7 @@ ui <- dashboardPage(skin = "black",
                                                sliderInput('check3', 'Year', min = 1900, max = 2010, value = 1900, round = TRUE, sep = "", animate = TRUE),
                                                bsButton("ref4","Show Reference", size="small")),
 
-                                                      
+
                                                column(8,
                                                       htmlOutput("refer4", container = tags$div, class = "custom-li-output"))
                                              ),
@@ -147,7 +147,7 @@ ui <- dashboardPage(skin = "black",
                                     #              fluidRow(
                                     #              sliderInput('check3', 'Year', min = 1900, max = 2010, value = 1900, round = TRUE, sep = "", animate = TRUE),
                                     #              bsButton("ref4","Show Reference", size="small"))),
-                                    #            
+                                    #
                                     #            mainPanel(
                                     #              htmlOutput("refer4", container = tags$div, class = "custom-li-output"),
                                     #              plotOutput("intercensal_us")))),
@@ -161,9 +161,9 @@ ui <- dashboardPage(skin = "black",
                                              htmlOutput("refer5", container = tags$div, class = "custom-li-output"))),
                                              hr(),
                                              plotOutput("intercensal_uk"))
-                                             
+
                                     ))),
-                        
+
                         tabItem(tabName = "fecundity_rate",
                                 fluidPage(
                                   tabsetPanel(
@@ -182,5 +182,5 @@ ui <- dashboardPage(skin = "black",
                                                  br(),br(),br(),br(),
                                                  htmlOutput("refer6", container = tags$div, class = "custom-li-output")
                                                ))))))
-                        
+
                       )))

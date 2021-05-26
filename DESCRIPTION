@@ -1,0 +1,19 @@
+Title: Life Tables
+ShortName: Life Tables
+Date: 2021-05-27
+Lifecycle: experimental
+Authors@R: c(
+    person(given = "Yuqing", family = "Lei", role = c("aut", "cre")),
+    person(given = "Neil", family = "Hatfield", email = "neil.hatfield@psu.edu", role = c("ctb")),
+    person(given = "Stephen", family = "Schaeffer", role = c("fnd"))
+  )
+Chapter: Biology
+Description: In this app, you will explore various Life Tables for three different countries.
+LearningObjectives: c(
+    "The student will learn will to assess life tables for various countries."  )
+DisplayMode: Normal
+URL: https://psu-eberly.shinyapps.io/Life_Table
+BugReports: https://github.com/EducationShinyAppTeam/Life_Table/issues
+License: CC-BY-NC-SA-4.0
+Tags: real data, biology
+Type: Shiny
