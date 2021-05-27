@@ -28,6 +28,28 @@ fertility <- read.table(
   sep = ","
 )
 
+popPyramid <- read.table(
+  file = "Pyramid.csv",
+  header = TRUE,
+  sep = ","
+) %>%
+  tidyr::pivot_longer(
+    cols = !c("age.x"),
+    names_to = "countrySex",
+    values_to = "count"
+  ) %>%
+  dplyr::mutate(
+    countrySex = dplyr::case_when(
+      countrySex == "UK.M" ~ "United Kingdom-Male",
+      countrySex == "UK.F" ~ "United Kingdom-Female",
+      countrySex == "US.M" ~ "United States-Male",
+      countrySex == "US.F" ~ "United States-Female",
+      countrySex == "China.M" ~ "China-Male",
+      countrySex == "China.F" ~ "China-Female"
+    ),
+    count = count / 1000
+  )
+
 data2 <- read.csv("Pyramid.csv")
 us_2010 <- read.csv("us-est00int-alldata.csv", header = TRUE, sep = ",")
 us_1979 <- read.csv("us_1900_1979.csv", header = FALSE)
@@ -224,6 +246,14 @@ ui <- list(
                   width = 8,
                   offset = 0,
                   plotlyOutput("pyramidCountrySex") %>%
+                    withSpinner(color = boastPalette[3])
+                )
+              ),
+              fluidRow(
+                column(
+                  width = 8,
+                  offset = 4,
+                  plotOutput("new1") %>%
                     withSpinner(color = boastPalette[3])
                 )
               )
@@ -563,7 +593,70 @@ server <- function(input, output, session) {
 
   })
 
-  ## Country & Sex Cohor Pyramids ----
+  ## Country & Sex Cohort Pyramids ----
+  observeEvent(
+    eventExpr = c(input$cohortLeft, input$cohortRight),
+    handlerExpr = {
+      output$new1 <- renderPlot(
+        expr = {
+          validate(
+            need(
+              expr = !is.null(input$cohortLeft) & !is.null(input$cohortRight),
+              message = "Please select options for both the left and right sides"
+            ),
+            need(
+              expr = input$cohortLeft != input$cohortRight,
+              message = "Please select two different groups to compare"
+            )
+          )
+          popPyramid %>%
+            ggplot(
+              mapping = aes(x = age.x, fill = countrySex)
+            ) +
+            geom_col(
+              data = subset(popPyramid, countrySex == input$cohortLeft),
+              mapping = aes(y = -1 * count),
+              na.rm = TRUE
+            ) +
+            geom_col(
+              data = subset(popPyramid, countrySex == input$cohortRight),
+              mapping = aes(y = count),
+              na.rm = TRUE
+            ) +
+            coord_flip() +
+            theme_bw() +
+            ylab("Percentage Alive") +
+            xlab("Age (years)") +
+            labs(
+              title = paste(input$cohortLeft, "vs.", input$cohortRight),
+              fill = "Country & Sex"
+            ) +
+            theme(
+              text = element_text(size = 18),
+              legend.position = "bottom"
+            ) +
+            scale_x_continuous(
+              limits = c(0, 101),
+              expand = expansion(mult = 0, add = c(0,1)),
+              breaks = seq.int(from = 0, to = 100, by = 5),
+              minor_breaks = NULL
+            ) +
+            scale_y_continuous(
+              limits = c(-100, 100),
+              expand = expansion(mult = 0, add = 5),
+              breaks = seq.int(from = -100, to = 100, by = 25),
+              labels = c(100, 75, 50, 25, 0, 25, 50, 75, 100)
+            ) +
+            scale_fill_manual(
+              values = boastUtils::boastPalette
+            )
+        },
+        alt = paste("Population Pyramids for", input$cohortLeft, "and",
+                    input$cohortRight)
+      )
+    }
+  )
+
   #pyramid (2):
   color_r <- c()
   color_l <- c()
@@ -1330,52 +1423,6 @@ server <- function(input, output, session) {
     },
     ignoreNULL = FALSE
   )
-
-
-  ############>>>>Fecundity rate tab:
-  # output$fecundityPlot <- renderPlot({
-  #   longData2 <- cbind(rep(fertility$age, 3), stack(fertility[,2:4]))
-  #   names(longData2) <- c("age", "fRate", "grp")
-  #   longData2 <-
-  #     transform(longData2, color = ifelse(
-  #       grp == "uk",
-  #       '#F38770',
-  #       ifelse(
-  #         grp == "cn",
-  #         '#CACA3B',
-  #         ifelse(
-  #           grp == "us",
-  #           '#FEA54C',
-  #           NA
-  #         )
-  #       )
-  #     ))
-  #
-  #   longData2$grp <-
-  #     plyr::revalue(
-  #       longData2$grp,
-  #       c(
-  #         "uk" = "United Kingdom",
-  #         "us" = "United States",
-  #         "cn" = "China"
-  #       )
-  #     )
-  #
-  #   subLData2 <- dplyr::filter(longData2, longData2$grp %in% input$fecundityCountry)
-  #   ggplot(data=na.omit(subLData2), aes(x=age, y=fRate, color=grp)) +
-  #     geom_path(lwd = 1) +
-  #     scale_y_continuous(expand=expand_scale(mult = 0, add = 0), limits = c(0,120)) +
-  #     theme(panel.background = element_rect(fill = 'white', color = 'black'),
-  #           text = element_text(size = 14),
-  #           plot.title = element_text(size = 14),
-  #           axis.text = element_text(size = 14),
-  #           legend.position = c(0.85,0.80),
-  #           legend.title = element_blank()) +
-  #     labs(title = "Fecundity Rate (per 1,000 women) for comparison",
-  #          y = "Number of Birth per 1,000 Women",
-  #          x = "Age(yrs)") +
-  #     scale_color_manual(breaks = longData2$grp, values = unique(as.character(longData2$color)))
-  # })
 }
 
 # Boast App Call ----
