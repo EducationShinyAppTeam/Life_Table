@@ -1,1 +1,115 @@
-﻿age,uk,us,cn12,,0.4,13,,,14,0.5,,15,2.2,,0.9416,7.7,15.4,1.2417,18.3,,4.8218,30.3,54.1,7.6919,43.8,,14.6520,53.4,,29.1521,62.6,,56.1322,72,85.3,69.9723,78.7,,85.6724,84.8,,87.6125,91.7,,81.9426,98,,85.1527,103.5,107.2,73.828,107.5,,73.329,114.7,,71.7530,115.4,,51.8431,117.3,,49.5132,113,96.5,36.4233,108.3,,35.134,100.2,,31.2335,88,,16.7736,76.3,,14.837,61.8,47.2,14.0638,48.2,,11.5439,37.7,,6.6840,26.6,,5.241,18.2,,4.9842,11,10.3,2.3643,6.4,,2.344,3.4,,2.0245,4.2,,1.3746,,,0.8747,,0.7,1.3348,,,1.4449,,,1.2
+age,country,fertility
+12,United Kingdom,NA
+12,United States,0.4
+12,China,NA
+13,United Kingdom,NA
+13,United States,NA
+13,China,NA
+14,United Kingdom,0.5
+14,United States,NA
+14,China,NA
+15,United Kingdom,2.2
+15,United States,NA
+15,China,0.94
+16,United Kingdom,7.7
+16,United States,15.4
+16,China,1.24
+17,United Kingdom,18.3
+17,United States,NA
+17,China,4.82
+18,United Kingdom,30.3
+18,United States,54.1
+18,China,7.69
+19,United Kingdom,43.8
+19,United States,NA
+19,China,14.65
+20,United Kingdom,53.4
+20,United States,NA
+20,China,29.15
+21,United Kingdom,62.6
+21,United States,NA
+21,China,56.13
+22,United Kingdom,72
+22,United States,85.3
+22,China,69.97
+23,United Kingdom,78.7
+23,United States,NA
+23,China,85.67
+24,United Kingdom,84.8
+24,United States,NA
+24,China,87.61
+25,United Kingdom,91.7
+25,United States,NA
+25,China,81.94
+26,United Kingdom,98
+26,United States,NA
+26,China,85.15
+27,United Kingdom,103.5
+27,United States,107.2
+27,China,73.8
+28,United Kingdom,107.5
+28,United States,NA
+28,China,73.3
+29,United Kingdom,114.7
+29,United States,NA
+29,China,71.75
+30,United Kingdom,115.4
+30,United States,NA
+30,China,51.84
+31,United Kingdom,117.3
+31,United States,NA
+31,China,49.51
+32,United Kingdom,113
+32,United States,96.5
+32,China,36.42
+33,United Kingdom,108.3
+33,United States,NA
+33,China,35.1
+34,United Kingdom,100.2
+34,United States,NA
+34,China,31.23
+35,United Kingdom,88
+35,United States,NA
+35,China,16.77
+36,United Kingdom,76.3
+36,United States,NA
+36,China,14.8
+37,United Kingdom,61.8
+37,United States,47.2
+37,China,14.06
+38,United Kingdom,48.2
+38,United States,NA
+38,China,11.54
+39,United Kingdom,37.7
+39,United States,NA
+39,China,6.68
+40,United Kingdom,26.6
+40,United States,NA
+40,China,5.2
+41,United Kingdom,18.2
+41,United States,NA
+41,China,4.98
+42,United Kingdom,11
+42,United States,10.3
+42,China,2.36
+43,United Kingdom,6.4
+43,United States,NA
+43,China,2.3
+44,United Kingdom,3.4
+44,United States,NA
+44,China,2.02
+45,United Kingdom,4.2
+45,United States,NA
+45,China,1.37
+46,United Kingdom,NA
+46,United States,NA
+46,China,0.87
+47,United Kingdom,NA
+47,United States,0.7
+47,China,1.33
+48,United Kingdom,NA
+48,United States,NA
+48,China,1.44
+49,United Kingdom,NA
+49,United States,NA
+49,China,1.2
