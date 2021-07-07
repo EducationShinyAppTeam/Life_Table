@@ -4,16 +4,9 @@ library(shinydashboard)
 library(shinyBS)
 library(shinyWidgets)
 library(boastUtils)
-#library(shinyjs)
 library(ggplot2)
-library(plotly)
 library(shinycssloaders)
 library(dplyr)
-# library(formattable)
-# library(XML)
-library(reshape2)
-library(plyr)
-# library(gridExtra)
 
 # Global Constants, Functions, and Data ----
 fixedColors <- c(
@@ -344,17 +337,84 @@ ui <- list(
           h2("References"),
           p(
             class = "hangingindent",
-            "https://www.cdc.gov/nchs/data/nvsr/nvsr67/nvsr67_07-508.pdf"
+            "Bailey, E. (2015). shinyBS: Twitter bootstrap components for shiny.
+            (v0.61). [R package]. Available from
+            https://CRAN.R-project.org/package=shinyBS"
           ),
           p(
             class = "hangingindent",
-            "https://www.ons.gov.uk/peoplepopulationandcommunity/
-            birthsdeathsandmarriages/lifeexpectancies/datasets/
-            nationallifetablesunitedkingdomreferencetables"
+            "Carey, R. and Hatfield, N. (2021), boastUtils: BOAST Utilities.
+            (v. 0.1.10.4), [R Package] Available from
+            https://github.com/EducationShinyAppTeam/boastUtils"
           ),
           p(
             class = "hangingindent",
-            "BROKEN: http://bxjg.circ.gov.cn/web/site0/tab5216/info4054990.htm"
+            "Chang, W., and Borges Ribeiro, B. (2018), shinydashboard: Create
+            dashboards with 'Shiny'.(v. 0.7.1) [R package] Available from
+            https://CRAN.R-project.org/package=shinydashboard"
+          ),
+          p(
+            class = "hangingindent",
+            "Chang, W., Cheng, J., Allaire, J. J., Sivert, C., Schloerke, B.,
+            Xie, Y., Allen, J., McPherson, J., Dipert, A., and Borges, B. (2021),
+            shiny: Web application framework for R. (v. 1.6.0) [R package]
+            Available from https://CRAN.R-project.org/package=shiny"
+          ),
+          p(
+            class = "hangingindent",
+            "Oceanwide Expeditions. (n.d.) The Eight great penguin species of
+            Antarctica. [Blog post; title image] Available from
+            https://oceanwide-expeditions.com/blog/meet-all-6-antarctic-penguin-species"
+          ),
+          p(
+            class = "hangingindent",
+            "Perrier, V., Meyer, F., and Granjon, D. (2021), shinyWidgets:
+            Custom inputs widgets for shiny. (v. 0.6.0) [R Package] Available
+            from https://CRAN.R-project.org/package=shinyWidgets"
+          ),
+          p(
+            class = "hangingindent",
+            "Sali, A., and Attali, D. (2020), shinycssloaders: Add Loading
+            Animations to a 'shiny' Ouput While It's Recalculating. (v. 1.0.0)
+            [R Package] Available https://CRAN.R-project.org/package=shinycssloaders"
+          ),
+          p(
+            class = "hangingindent",
+            "Wickham, H. (2016). ggplot2: Elegant graphics for data analysis.
+            Springer-Verlag:New York."
+          ),
+          p(
+            class = "hangingindent",
+            "Wickham, H., François, R., Henry, L., and Müller, K. (2021). dplyr:
+            A Grammar of Data Manipulation. (v. 1.0.7) [R Package] Available
+            https://CRAN.R-project.org/package=dplyr"
+          ),
+          h3("Data Sources"),
+          p("Data for this app was retrived from:"),
+          tags$ul(
+            tags$li(
+              "United States: ", tags$a(
+                href = "https://www.cdc.gov/nchs/data/nvsr/nvsr67/nvsr67_07-508.pdf",
+                class = "bodylinks",
+                target = "_blank",
+                "https://www.cdc.gov/nchs/data/nvsr/nvsr67/nvsr67_07-508.pdf")
+            ),
+            tags$li(
+              "United Kingdom: ", tags$a(
+                href = "https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/datasets/nationallifetablesunitedkingdomreferencetables",
+                class = "bodylinks",
+                target = "_blank",
+                "https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/ lifeexpectancies/datasets/nationallifetablesunitedkingdomreferencetables"
+              )
+            ),
+            tags$li(
+              "China: ", tags$a(
+                href = "http://www.stats.gov.cn/english/",
+                class = "bodylinks",
+                target = "_blank",
+                "http://www.stats.gov.cn/english/"
+              )
+            ) #original link is broken: http://bxjg.circ.gov.cn/web/site0/tab5216/info4054990.htm
           ),
           br(),
           br(),
