@@ -1,10 +1,10 @@
 Title: Life Tables
 ShortName: Life Tables
-Date: 2021-05-27
+Date: 2021-07-7
 Lifecycle: experimental
 Authors@R: c(
     person(given = "Yuqing", family = "Lei", role = c("aut", "cre")),
-    person(given = "Neil", family = "Hatfield", email = "neil.hatfield@psu.edu", role = c("ctb")),
+    person(given = "Neil", family = "Hatfield", email = "neil.hatfield@psu.edu", role = c("aut")),
     person(given = "Stephen", family = "Schaeffer", role = c("fnd"))
   )
 Chapter: Biology
