@@ -72,15 +72,15 @@ ui <- list(
           tabName = "overview",
           h1("Life Tables"),
           p("In this app, you will explore various ways to visualize life tables
-            for 3 different countries--China, the United Kingdom, and the United
+            for 3 different countries", HTML("&mdash;"),"China, the United Kingdom, and the United
             States of America. You'll be able to look at the several different
             metrics associated with life tables (e.g., survival and fecundity
             rates) by country and by sex."),
           h2("Instructions"),
-          p("Use the left sidebar menu to explore the following life tables."),
+          p("Use the left sidebar menu to explore the life tables."),
           tags$ul(
             tags$li(tags$strong("Survival Rate:"), " Click the country and sex
-                    combination you preferred to compare, and view the distinct
+                    combination you prefer to compare, and view the distinct
                     Survival Rate for each country and sex."),
             tags$li(tags$strong("Static Population Pyramids:"), " View and compare
                     Population Pyramids for different countries, as well as the
@@ -200,6 +200,7 @@ ui <- list(
                   width = 8,
                   offset = 0,
                   plotOutput("upperPyramid"),
+                  br(),
                   plotOutput("lowerPyramid")
                 )
               )
@@ -208,7 +209,7 @@ ui <- list(
             tabPanel(
               title = "Country & Sex Comparisons",
               br(),
-              p("Population pryamids can also be mixed and matched across countries
+              p("Population pyramids can also be mixed and matched across countries
                 and sex. Create various pryamids to compare the different pairings
                 of country and sex. What do you notice?"),
               fluidRow(
@@ -263,7 +264,7 @@ ui <- list(
           p("Connecting population pyramids with time allows us to explore changes
             in a country's population. This allows us to see when there might be
             large increases in the population as well as when a country might
-            suffer from catesphroic loss of life."),
+            suffer from catastrophic loss of life."),
           p("Explore both population pyramids for the United Kingdom and the
             United States. What do you notice? What might explain any big changes?"),
           fluidRow(
@@ -295,7 +296,9 @@ ui <- list(
             column(
               width = 8,
               offset = 0,
-              plotOutput("timePyramid")
+              plotOutput("timePyramid"),
+              p(tags$em("Note: "), "Interpret the oldest age group as being that
+                age or older.")
             )
           )
         ),
@@ -303,7 +306,7 @@ ui <- list(
         tabItem(
           tabName = "fecundityRate",
           h2("Fecundity Rate"),
-          p("A common metric for life tables is that a country's fecundity rate.
+          p("A common metric for life tables is a country's fecundity rate.
             A country's fecundity rate refers to the number of new children born
             in a year. Here, we've shown each country's fecundity rate as the
             number of children born per 1,000 women plotted against the age of
@@ -767,7 +770,7 @@ server <- function(input, output, session) {
             scale_x_continuous(
               limits = c(0, 85),
               expand = expansion(mult = 0, add = c(0,1)),
-              breaks = seq.int(from = 0, to = 85, by = 5),
+              breaks = seq.int(from = 0, to = 100, by = 5),
               minor_breaks = NULL
             ) +
             scale_y_continuous(
