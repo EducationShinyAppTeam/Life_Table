@@ -24,6 +24,15 @@ countryColors <- c(
   "China" = psuPalette[7]
 )
 
+fixedLines <- c(
+  "UK-Males" = "solid",
+  "UK-Females" = "longdash",
+  "US-Males" = "dotted",
+  "US-Females" = "dashed",
+  "China-Males" = "dotdash",
+  "China-Females" = "twodash"
+)
+
 load(file = "allData.RData")
 
 
@@ -485,9 +494,7 @@ server <- function(input, output, session) {
             xlab("Age (years)") +
             ylab("Survival Rate") +
             labs(
-              title = "Survival Rates by Age for Country and Sex",
-              color = "Country & Sex",
-              linetype = "Country & Sex"
+              title = "Survival Rates by Age for Country and Sex"
             ) +
             theme(
               text = element_text(size = 18),
@@ -497,7 +504,12 @@ server <- function(input, output, session) {
               expand = expansion(mult = c(0, 0.05), add = 0)
             ) +
             scale_color_manual(
+              name = "Country & Sex",
               values = fixedColors
+            ) +
+            scale_linetype_manual(
+              name = "Country & Sex",
+              values = fixedLines
             )
         },
         alt = "The survival rates at each age for selected countries and sexes"
